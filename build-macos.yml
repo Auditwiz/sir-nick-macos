@@ -1,0 +1,65 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build macOS app
+      run: pyinstaller Sir_Nick_macOS.spec
+    
+    - name: Create DMG installer
+      run: |
+        brew install create-dmg
+        create-dmg \
+          --volname "Sir Nick Installer" \
+          --volicon "dist/Sir Nick.app/Contents/Resources/icon-windowed.icns" \
+          --window-pos 200 120 \
+          --window-size 600 400 \
+          --icon-size 100 \
+          --icon "Sir Nick.app" 150 185 \
+          --hide-extension "Sir Nick.app" \
+          --app-drop-link 450 185 \
+          "Sir-Nick-macOS-Installer.dmg" \
+          "dist/Sir Nick.app" || \
+        create-dmg \
+          --volname "Sir Nick Installer" \
+          --window-pos 200 120 \
+          --window-size 600 400 \
+          --icon-size 100 \
+          --app-drop-link 450 185 \
+          "Sir-Nick-macOS-Installer.dmg" \
+          "dist/Sir Nick.app"
+    
+    - name: Upload DMG artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Sir-Nick-macOS-Installer
+        path: Sir-Nick-macOS-Installer.dmg
+    
+    - name: Upload app bundle artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Sir-Nick-App-Bundle
+        path: dist/Sir Nick.app
+
+# Made with Bob
