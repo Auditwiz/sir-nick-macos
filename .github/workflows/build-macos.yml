@@ -51,7 +51,7 @@ jobs:
           "dist/Sir Nick.app"
     
     - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Sir-Nick-macOS-Installer
         path: Sir-Nick-macOS-Installer.dmg
